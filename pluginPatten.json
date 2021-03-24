@@ -1,0 +1,137 @@
+{ 
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"definitions": {
+		"perm": {
+			"type": "string",
+			"pattern": "^[A-Za-z]+\.[A-Za-z\.]+$"
+		},
+		"cperm": {
+			"type": "boolean"
+		},
+		"stringArray": {
+            "type": "array",
+            "items": { "type": "string" },
+            "uniqueItems": true,
+            "default": []
+        },
+		"command": {
+		  "type": "object",
+		  "pattern": "[A-Za-z]+:$",
+		  "properties": {
+			"usage": { "type": "string" },
+			"aliases": { 
+				"type": "stringArray"
+			},
+			"description": { "type": "string" },
+			"permission": { "$ref": "#/definitions/perm" },
+			"permission-message": { 
+				"type": "string", 
+				"default": "§cYou don't have enough permissions to execute this command." 
+			}
+		  },
+		  "required": ["description"]
+		},
+		"permission": {
+			"type": "object",
+			"pattern": "^[A-Za-z]+\.[A-Za-z\.]+$",
+			"properties": {
+				"description": { "type": "string" },
+				"default": { 
+					"type": ["string", "boolean"],
+					"enum": [true, false, "op", "not op"]
+				},
+				"children": { 
+					"type": "object",
+					"description": "List of children permissions",
+					"propertyNames": {
+						"pattern": "^[A-Za-z]+\.[A-Za-z\.]+$"
+					},
+					"additionalProperties": {
+						"$ref": "#/definitions/cperm"
+					}
+				}
+			},
+			"required": ["description"]
+		}
+	},
+
+	"properties": {
+	    "main" : {
+            "type": "string",
+            "description": "Package path to main class that extends JavaPlugin"
+        },
+		"name": { 
+			"type": "string",
+			"default": "CMC-",
+			"description": "The name of your plugin."
+		},
+        "version": {
+            "type": "string",
+            "description": "The version of your plugin."
+        },
+		"description" : {
+            "type": "string",
+            "description": "A human friendly description of the functionality your plugin provides."
+        },
+		"api-version" : {
+            "type": "string",
+			"default": "1.13",
+            "description": "The version of the API you want to use."
+        },
+		"load" : {
+            "type": "string",
+			"enum": ["STARTUP", "POSTWORLD"],
+			"default": "POSTWORLD",
+            "description": "Select when the plugin should startup."
+        },
+		"author" : {
+            "type": "string",
+            "description": "Author of this plugin"
+        },
+		"authors" : {
+            "$ref": "#/definitions/stringArray",
+            "description": "List of authors of this plugin"
+        },
+		"website" : {
+            "type": "string",
+			"pattern": "^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/\/=]*)$",
+            "description": "The plugin's or author's website."
+        },
+		"depend" : {
+            "$ref": "#/definitions/stringArray",
+            "description": "List of plugins that must load before this plugin"
+        },
+		"prefix" : {
+            "type": "string",
+            "description": "The name to use when logging to console instead of the plugin's name."
+        },
+		"softdepend" : {
+            "$ref": "#/definitions/stringArray",
+            "description": "List of plugins that should if available load before this plugin"
+        },
+		"loadbefore" : {
+            "$ref": "#/definitions/stringArray",
+            "description": "A list of plugins that should be loaded after this plugin."
+        },
+		"commands": {
+			"type": "object",
+			"description": "List of plugin commands.",
+			"propertyNames": {
+				"pattern": "^[^\s]+$"
+			},
+			"additionalProperties": {
+				"$ref": "#/definitions/command"
+			}
+		},
+		"permissions": {
+			"type": "object",
+			"description": "List of plugin permission nodes.",
+			"propertyNames": {
+				"pattern": "^[A-Za-z]+\.[A-Za-z\.\*]+$"
+			},
+			"additionalProperties": {
+				"$ref": "#/definitions/permission"
+			}
+		}
+	}
+}
